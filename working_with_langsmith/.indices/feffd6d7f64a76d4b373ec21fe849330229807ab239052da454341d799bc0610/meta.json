@@ -1,0 +1,6 @@
+{
+  "pdf_path": "G:\\sushant\\LangSmith\\working_with_langsmith\\Sushant Twayana Resume Updated.pdf",
+  "chunk_size": 1000,
+  "chunk_overlap": 150,
+  "embedding_model": "gemma:2b"
+}

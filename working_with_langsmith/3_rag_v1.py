@@ -23,7 +23,7 @@ os.environ["GROQ_API_KEY"]=os.getenv("GROQ_API_KEY")
 os.environ["LANGCHAIN_PROJECT"]="PDF RAG Example"
 
 llm=ChatGroq(model="openai/gpt-oss-120b", temperature=0.5)
-PDF_PATH = "islr.pdf"  # <-- change to your PDF filename
+PDF_PATH = "Sushant Twayana Resume Updated.pdf"  # <-- change to your PDF filename
 
 # 1) Load PDF
 loader = PyPDFLoader(PDF_PATH)

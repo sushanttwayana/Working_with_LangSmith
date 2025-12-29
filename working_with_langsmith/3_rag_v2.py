@@ -6,24 +6,30 @@ from dotenv import load_dotenv
 from langsmith import traceable  # <-- key import
 
 from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableParallel, RunnablePassthrough, RunnableLambda
 from langchain_core.output_parsers import StrOutputParser
 
-# --- LangSmith env (make sure these are set) ---
-# LANGCHAIN_TRACING_V2=true
-# LANGCHAIN_API_KEY=...
-# LANGCHAIN_PROJECT=pdf_rag_demo
+
+from langchain_groq import ChatGroq
+import os
+from langchain_ollama import OllamaEmbeddings
 
 load_dotenv()
 
-PDF_PATH = "islr.pdf"  # change to your file
+#os.environ["OPENAI_API_KEY"]=os.getenv("OPENAI_API_KEY")
+os.environ["GROQ_API_KEY"]=os.getenv("GROQ_API_KEY")
+
+
+os.environ["LANGCHAIN_PROJECT"]="PDF RAG Example"
+
+llm=ChatGroq(model="openai/gpt-oss-120b", temperature=0.5)
+PDF_PATH = "Sushant Twayana Resume Updated.pdf"  # <-- change to your PDF filename
 
 # ---------- traced setup steps ----------
-@traceable(name="load_pdf")
+@traceable(name="load_pdf", tags=['pdf', 'loader'], metadata={'loader': 'PyPDFLoader'})
 def load_pdf(path: str):
     loader = PyPDFLoader(path)
     return loader.load()  # list[Document]
@@ -35,9 +41,10 @@ def split_documents(docs, chunk_size=1000, chunk_overlap=150):
     )
     return splitter.split_documents(docs)
 
-@traceable(name="build_vectorstore")
+@traceable(name="build_vectorstore", tags=['vectorstore', 'faiss'], metadata={'vectorstore': 'FAISS', 'embedding_model': 'OllamaEmbeddings-gemma:2b'} )
 def build_vectorstore(splits):
-    emb = OpenAIEmbeddings(model="text-embedding-3-small")
+    # emb = OpenAIEmbeddings(model="text-embedding-3-small")
+    emb = OllamaEmbeddings(model="gemma:2b")
     # FAISS.from_documents internally calls the embedding model:
     vs = FAISS.from_documents(splits, emb)
     return vs
@@ -51,7 +58,7 @@ def setup_pipeline(pdf_path: str):
     return vs
 
 # ---------- pipeline ----------
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+# llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
 prompt = ChatPromptTemplate.from_messages([
     ("system", "Answer ONLY from the provided context. If not found, say you don't know."),
