@@ -6,7 +6,18 @@ from langchain.agents import create_react_agent, AgentExecutor
 from langchain import hub
 from dotenv import load_dotenv
 
+from langchain_groq import ChatGroq
+import os
+
 load_dotenv()
+
+#os.environ["OPENAI_API_KEY"]=os.getenv("OPENAI_API_KEY")
+os.environ["GROQ_API_KEY"]=os.getenv("GROQ_API_KEY")
+
+
+os.environ["LANGCHAIN_PROJECT"]="ReAct Agent Example"
+
+llm=ChatGroq(model="openai/gpt-oss-120b", temperature=0.5)
 
 search_tool = DuckDuckGoSearchRun()
 
@@ -21,7 +32,7 @@ def get_weather_data(city: str) -> str:
 
   return response.json()
 
-llm = ChatOpenAI()
+# llm = ChatOpenAI()
 
 # Step 2: Pull the ReAct prompt from LangChain Hub
 prompt = hub.pull("hwchase17/react")  # pulls the standard ReAct agent prompt
@@ -46,7 +57,7 @@ agent_executor = AgentExecutor(
 # Identify the birthplace city of Kalpana Chawla (search) and give its current temperature.
 
 # Step 5: Invoke
-response = agent_executor.invoke({"input": "What is the current temp of gurgaon"})
+response = agent_executor.invoke({"input": "What is the current temp of kathmandu?"})
 print(response)
 
 print(response['output'])

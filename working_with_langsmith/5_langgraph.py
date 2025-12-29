@@ -11,8 +11,21 @@ from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, START, END
 
 # ---------- Setup ----------
+from langchain_groq import ChatGroq
+import os
+
 load_dotenv()
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+
+#os.environ["OPENAI_API_KEY"]=os.getenv("OPENAI_API_KEY")
+os.environ["GROQ_API_KEY"]=os.getenv("GROQ_API_KEY")
+
+
+os.environ["LANGCHAIN_PROJECT"]="LangSmith with Langgraph"
+
+# model = ChatGroq(model="openai/gpt-oss-120b")
+model = ChatGroq(model="llama-3.3-70b-versatile")
+model
+
 
 # ---------- Structured schema & model ----------
 class EvaluationSchema(BaseModel):
@@ -120,7 +133,7 @@ if __name__ == "__main__":
             "tags": ["essay", "langgraph", "evaluation"],
             "metadata": {
                 "essay_length": len(essay2),
-                "model": "gpt-4o-mini",
+                "model": "llama-3.3-70b-versatile",
                 "dimensions": ["language", "analysis", "clarity"],
             },
         },
